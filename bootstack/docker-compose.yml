@@ -23,7 +23,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=America/Bogota
-      - APP_URL=https://bookstack.zoolve.com
+      - APP_URL=https://localhost:6875
       - APP_KEY=base64:eMWCocRfDzWMvt+S3MSjzEGzlXMHv+4XwFUaPpDxNvk=
       - DB_HOST=bookstack-db
       - DB_PORT=3306

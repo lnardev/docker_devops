@@ -24,7 +24,7 @@ services:
       LISTEN: 45876
       KEY: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILCn8irCdXcz21xwc6FTIu4zMJOkjWvAbWPQtbDYrNcG'
       TOKEN: 2727-2c4bdd744a-2cee-bd15729508
-      HUB_URL: http://157.137.215.22:9000
+    HUB_URL: http://X.X.X.X:9000
 
 volumes:
   beszel_data:
