@@ -1,0 +1,76 @@
+# =====================================================
+# Configuración de SonarQube para tu proyecto
+# =====================================================
+
+# Información básica del proyecto
+# Este es el projectKey generado por SonarQube
+sonar.projectKey=lnard.dev_cmx_mexico_48021684-6fb7-4df2-8fcb-7fa808c1591c
+sonar.qualitygate.wait=true
+sonar.projectVersion=1.0
+
+# Ruta del código fuente (relativa a este archivo)
+sonar.sources=.
+
+# Codificación del código fuente
+sonar.sourceEncoding=UTF-8
+
+# =====================================================
+# Exclusiones
+# =====================================================
+
+# Directorios a excluir del análisis
+sonar.exclusions=\
+  **/node_modules/**,\
+  **/dist/**,\
+  **/build/**,\
+  **/.next/**,\
+  **/coverage/**,\
+  **/*.test.js,\
+  **/*.test.ts,\
+  **/*.spec.js,\
+  **/*.spec.ts,\
+  **/vendor/**,\
+  **/venv/**,\
+  **/__pycache__/**
+
+# Archivos de test
+sonar.test.inclusions=\
+  **/*.test.js,\
+  **/*.test.ts,\
+  **/*.spec.js,\
+  **/*.spec.ts
+
+# =====================================================
+# Configuración del servidor
+# =====================================================
+
+# URL del servidor SonarQube
+# IMPORTANTE: En GitLab CI/CD, usa la variable ${SONAR_HOST_URL}
+sonar.host.url=http://localhost:9000
+
+# Token de autenticación (generado en SonarQube)
+# IMPORTANTE: NUNCA subas este archivo con el token real
+# En GitLab CI/CD, usa la variable de entorno: ${SONAR_TOKEN}
+# sonar.token=YOUR_SONAR_TOKEN_HERE
+
+# =====================================================
+# Configuración específica por lenguaje
+# =====================================================
+
+# JavaScript/TypeScript
+# sonar.javascript.lcov.reportPaths=coverage/lcov.info
+# sonar.typescript.lcov.reportPaths=coverage/lcov.info
+
+# Python
+# sonar.python.coverage.reportPaths=coverage.xml
+# sonar.python.version=3.9
+
+# Java
+# sonar.java.binaries=target/classes
+# sonar.java.test.binaries=target/test-classes
+
+# =====================================================
+# Configuración de cobertura de código
+# =====================================================
+
+# sonar.coverage.exclusions=**/*.test.js,**/*.spec.js

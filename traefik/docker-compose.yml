@@ -1,0 +1,96 @@
+
+services:
+  traefik:
+    image: traefik:v3.5
+    container_name: traefik
+    command:
+      - "--api.insecure=true"     
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      # Habilita redirección HTTP->HTTPS automática
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+    ports:
+      - "80:80" # HTTP
+      - "443:443" # HTTPS
+      - "8080:8080" # Dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./certs:/certs
+    restart: unless-stopped
+    networks:
+      - web
+      
+
+  nodeapp:
+    image: nodeapp
+    container_name: nodeapp
+    build: ./nodeapp
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nodeapp.rule=Host(`app.dodigital.local`)"
+      - "traefik.http.services.nodeapp.loadbalancer.server.port=3000"
+      - "traefik.http.routers.nodeapp.entrypoints=web"
+      - "traefik.http.routers.nodeapp-secure.rule=Host(`app.dodigital.local`)"
+      - "traefik.http.routers.nodeapp-secure.entrypoints=websecure"
+      - "traefik.http.routers.nodeapp-secure.tls=true"
+    depends_on:
+      - traefik
+    restart: unless-stopped
+    networks:
+      - web
+
+  nodeapp2:
+    image: nodeapp2
+    container_name: nodeapp2
+    build: ./nodeapp2
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nodeapp2.rule=Host(`app2.dodigital.local`)"
+      - "traefik.http.services.nodeapp2.loadbalancer.server.port=3001"
+      - "traefik.http.routers.nodeapp2.entrypoints=web"
+      - "traefik.http.routers.nodeapp2-secure.rule=Host(`app2.dodigital.local`)"
+      - "traefik.http.routers.nodeapp2-secure.entrypoints=websecure"
+      - "traefik.http.routers.nodeapp2-secure.tls=true"
+    depends_on:
+      - traefik
+    restart: unless-stopped
+    networks:
+      - web
+
+  # Servicio MySQL (producción)
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/conf.d:/etc/mysql/conf.d
+    networks:
+      - backend
+    restart: unless-stopped
+
+  # Redis (opcional)
+  redis:
+    image: redis:alpine
+    container_name: redis
+    networks:
+      - backend
+    restart: unless-stopped
+
+networks:
+  web:
+    external: true
+  backend:
+    internal: true
+
+volumes:
+  mysql_data:

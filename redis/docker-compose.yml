@@ -1,0 +1,27 @@
+version: '3.3'
+
+services:
+  redis:
+    image: bitnami/redis:7.0.10
+    container_name: ${REDIS_CONTAINER_NAME}
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - ALLOW_EMPTY_PASSWORD=${ALLOW_EMPTY_PASSWORD}  # Puedes usar una variable de entorno para permitir contraseñas vacías
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    ports:
+      - '${REDIS_PORT}:6379'  # Usar el puerto desde el archivo .env
+    volumes:
+      - redis_cdg_volume:/bitnami/redis/data  # Volumen anónimo para persistencia de datos
+    restart: always
+    sysctls:
+      - net.core.somaxconn=65535
+    logging:
+      driver: "json-file"  # Tipo de driver para logging
+      options:
+        max-size: "2m"  # Tamaño máximo del archivo de log
+        max-file: "3"   # Máximo número de archivos de log rotados
+
+
+volumes:
+  redis_cdg_volume: {}  # Volumen anónimo sin nombre específico
+

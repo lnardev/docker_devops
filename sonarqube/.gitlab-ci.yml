@@ -1,0 +1,97 @@
+# =====================================================
+# GitLab CI/CD Pipeline con SonarQube
+# =====================================================
+
+image: 
+  name: sonarsource/sonar-scanner-cli:11
+  entrypoint: [""]
+
+variables:
+  # Ubicación del cache de análisis de SonarQube
+  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+  # Profundidad de git para análisis completo
+  GIT_DEPTH: "0"
+
+stages:
+  - test
+  - sonarqube
+
+# =====================================================
+# Stage: Test (Opcional - Descomenta si tienes tests)
+# =====================================================
+
+# Para proyectos Node.js/JavaScript/TypeScript
+# test:node:
+#   image: node:20
+#   stage: test
+#   script:
+#     - npm ci
+#     - npm test -- --coverage
+#   coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
+#   artifacts:
+#     reports:
+#       coverage_report:
+#         coverage_format: cobertura
+#         path: coverage/cobertura-coverage.xml
+#     paths:
+#       - coverage/
+#     expire_in: 1 week
+#   rules:
+#     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+#     - if: $CI_COMMIT_BRANCH == 'master'
+#     - if: $CI_COMMIT_BRANCH == 'main'
+#     - if: $CI_COMMIT_BRANCH == 'develop'
+
+# Para proyectos Python
+# test:python:
+#   image: python:3.11
+#   stage: test
+#   script:
+#     - pip install -r requirements.txt
+#     - pytest --cov=. --cov-report=xml
+#   artifacts:
+#     paths:
+#       - coverage.xml
+#     expire_in: 1 week
+#   rules:
+#     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+#     - if: $CI_COMMIT_BRANCH == 'master'
+#     - if: $CI_COMMIT_BRANCH == 'main'
+#     - if: $CI_COMMIT_BRANCH == 'develop'
+
+# =====================================================
+# Stage: SonarQube Analysis
+# =====================================================
+
+sonarqube-check:
+  stage: sonarqube
+  cache:
+    policy: pull-push
+    key: "sonar-cache-$CI_COMMIT_REF_SLUG"
+    paths:
+      - "${SONAR_USER_HOME}/cache"
+      - sonar-scanner/
+  script: 
+    - sonar-scanner -Dsonar.host.url="${SONAR_HOST_URL}"
+  allow_failure: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_BRANCH == 'master'
+    - if: $CI_COMMIT_BRANCH == 'main'
+    - if: $CI_COMMIT_BRANCH == 'develop'
+
+# =====================================================
+# Notas:
+# =====================================================
+# 1. Asegúrate de configurar las variables en GitLab CI/CD:
+#    - SONAR_TOKEN: Token generado en SonarQube
+#    - SONAR_HOST_URL: URL de tu servidor SonarQube
+#
+# 2. El archivo sonar-project.properties debe existir en la raíz
+#    del proyecto con la configuración correcta
+#
+# 3. Si tienes tests, descomenta la sección correspondiente
+#    (Node.js o Python) según tu proyecto
+#
+# 4. GitLab vulnerability report solo está disponible con
+#    GitLab Ultimate. No es necesario para SonarQube Community

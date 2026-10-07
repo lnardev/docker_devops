@@ -1,0 +1,47 @@
+x-environment: &default-environment
+  # Usamos '@db' porque ese es el nombre exacto de tu contenedor de Postgres
+  DATABASE_URL: postgres://admin:Colombia_32**@db:5432/glitchtip
+  VALKEY_URL: redis://valkey:6379
+  SECRET_KEY: change_me_to_something_random # Te recomiendo cambiarlo luego
+  
+  EMAIL_URL: smtp://lnard.dev%40gmail.com:yfkxewrttxpnwxwm@://gmail.com
+  DEFAULT_FROM_EMAIL: lnard.dev@gmail.com
+  GLITCHTIP_DOMAIN: https://glitchtip.zoolve.com
+ 
+  ENABLE_ADMIN: "True"
+  ENABLE_OPENAPI: "False"
+  GLITCHTIP_ENABLE_MCP: "False"
+  GLITCHTIP_ENABLE_DUCKDB: "False"
+   # 👇 AÑADE ESTA LÍNEA PARA QUITAR EL REGISTRO
+  ENABLE_USER_REGISTRATION: "False"
+
+x-depends_on: &default-depends_on
+  - valkey
+
+services:
+  valkey:
+    image: valkey/valkey:9
+    restart: unless-stopped
+    networks:
+      - db_net
+
+  web:
+    image: glitchtip/glitchtip:6
+    depends_on: *default-depends_on
+    ports:
+      - "8000:8000"
+    environment:
+      <<: *default-environment
+      SERVER_ROLE: all_in_one
+    restart: unless-stopped
+    volumes:
+      - uploads:/code/uploads
+    networks:
+      - db_net
+
+volumes:
+  uploads:
+
+networks:
+  db_net:
+    external: true

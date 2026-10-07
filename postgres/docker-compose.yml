@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: Colombia_32**
+    volumes:
+      - data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - db_net
+
+volumes:
+  data:
+
+networks:
+  db_net:
+    external: true
